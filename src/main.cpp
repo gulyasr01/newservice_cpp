@@ -129,9 +129,27 @@ private:
     unordered_map<unsigned int, multimap<float, News_metadata>> subnews_;
 };
 
+void print(const std::map<unsigned int, std::set<unsigned int>>& m) {
+    for (const auto& pair : m) {
+        std::cout << pair.first << " : { ";
+        for (auto val : pair.second) {
+            std::cout << val << " ";
+        }
+        std::cout << "}\n";
+    }
+}
 
 int main() {
     cout << "hellow news" << endl;
+
+    NewsAggregator nag;
+    nag.AddSubscription(1, 5, 2, vector<string>{"radio", "television"});
+    nag.AddSubscription(2, 7, 3, vector<string>{"cable"});
+    nag.NewsReceived(10, 100.0f, 4, vector<string>{"television"});
+    nag.NewsReceived(11, 100.0f, 4, vector<string>{"television", "cable"});
+    nag.NewsReceived(12, 150.0f, 4, vector<string>{"television", "streaming"});
+    map<unsigned int, set<unsigned int>> pubs = nag.Publish(200.0f, 100.0f);
+    print(pubs);
 
     return 0;
 }
