@@ -81,8 +81,6 @@ public:
 
         map<unsigned int, set<unsigned int>> news_to_users; 
 
-        // generate the news for every user
-        vector<pair<unsigned int, vector<unsigned>>> sub_news_filtered; // vec<(sub_id, vec<news_id>)>, todo: storing this is unnecessary
         for (const auto & subnews : subnews_) {
             // get the metadatas of the news in the given time range
             vector<News_metadata> news_in_range;
@@ -93,11 +91,9 @@ public:
             }
 
             const Subscriber & sub = subs_[subnews.first];
-            vector<unsigned> filtered_news_ids(sub.maxNewsPerSecond);
             // all the news in the time range can be displayed
             if (news_in_range.size() <= sub.maxNewsPerSecond) {
                 for (const auto & md : news_in_range) {
-                    filtered_news_ids.push_back(md.id);
                     news_to_users[md.id].insert(subnews.first); // converting: user gets new -> new gets this user
                 }
             // news need to be sorted
@@ -114,12 +110,10 @@ public:
                     }
                 });
                 
-                for (int i = 0; i < filtered_news_ids.size(); ++i) {
-                    filtered_news_ids[i] = news_in_range[filtered_idxs_desc[i]].id;
+                for (int i = 0; i < sub.maxNewsPerSecond; ++i) {
                     news_to_users[news_in_range[filtered_idxs_desc[i]].id].insert(subnews.first); // converting: user gets new -> new gets this user
                 }
             }
-            sub_news_filtered.push_back({subnews.first, move(filtered_news_ids)});
         }
 
         // convert the user:[news] to news:[user]
