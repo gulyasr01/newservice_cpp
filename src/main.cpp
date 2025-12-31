@@ -134,13 +134,14 @@ private:
     unordered_map<unsigned int, multimap<float, News_metadata>> subnews_;
 };
 
-void print(const std::map<unsigned int, std::set<unsigned int>>& m) {
+void print_publish(const std::map<unsigned int, std::set<unsigned int>>& m) {
+    std::cout << "publish: " << std::endl;
     for (const auto& pair : m) {
-        std::cout << pair.first << " : { ";
+        std::cout << "- news=" << pair.first << " to [";
         for (auto val : pair.second) {
             std::cout << val << " ";
         }
-        std::cout << "}\n";
+        std::cout << "]\n";
     }
 }
 
@@ -154,9 +155,7 @@ int main() {
     nag.NewsReceived(11, 100.0f, 5, vector<string>{"television", "cable"});
     nag.NewsReceived(12, 150.0f, 7, vector<string>{"television", "streaming"});
     map<unsigned int, set<unsigned int>> pubs = nag.Publish(200.0f, 100.0f);
-    print(pubs);
-
-    cout << endl;
+    print_publish(pubs);
 
     NewsAggregator nag2;
     nag.AddSubscription(1, 5, 2, vector<string>{"technology"});
@@ -170,7 +169,7 @@ int main() {
     nag.NewsReceived(6, 1003.0f, 5, vector<string>{"technology"});
     nag.NewsReceived(7, 1004.0f, 5, vector<string>{"technology", "sport"});
     map<unsigned int, set<unsigned int>> pubs2 = nag.Publish(1020.0f, 1000.0f);
-    print(pubs2);
+    print_publish(pubs2);
 
     return 0;
 }
