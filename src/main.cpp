@@ -66,7 +66,16 @@ public:
             for (const auto & sub_id : topics_subs_[t]) {
                 if (subs_[sub_id].minInterest <= news.interest) {
                     News_metadata md{news.timestamp, news.interest, id};
-                    subnews_[sub_id].insert({news.timestamp, move(md)});
+                    // check if this key-val already exists (this new was alreaddy added by another topic)
+                    auto range = subnews_[sub_id].equal_range(news.timestamp);
+                    bool exists = std::any_of(range.first, range.second,
+                        [&](auto const& elem) {
+                            return (elem.second.id == md.id);
+                        });
+
+                    if (!exists) {
+                        subnews_[sub_id].insert({news.timestamp ,move(md)});
+                    }
                 }
             }
         }
