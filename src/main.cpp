@@ -125,7 +125,6 @@ public:
             }
         }
 
-        // convert the user:[news] to news:[user]
         return news_to_users;
     }
 
@@ -134,7 +133,7 @@ private:
     unordered_map<unsigned int, News> news_;
     unordered_map<string, vector<unsigned int>> topics_news_; // bookeeping for news assigned to topics
     unordered_map<string, vector<unsigned int>> topics_subs_; // bookeeping for subs assigned to topics
-    unordered_map<unsigned int, multimap<float, News_metadata>> subnews_;
+    unordered_map<unsigned int, multimap<float, News_metadata>> subnews_; // todo: maybe just use multimat<ts, newsid> and deprecate news_metadata
 };
 
 void print_publish(const std::map<unsigned int, std::set<unsigned int>>& m) {
