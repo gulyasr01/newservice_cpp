@@ -105,8 +105,13 @@ public:
                 vector<unsigned> filtered_idxs_desc(news_in_range.size());
                 iota(filtered_idxs_desc.begin(), filtered_idxs_desc.end(), 0); // indexes
                 sort(filtered_idxs_desc.begin(), filtered_idxs_desc.end(), [&](int a, int b){
-                    return tie(news_in_range[a].interest, news_in_range[a].timestamp, news_in_range[a].timestamp) > 
-                           tie(news_in_range[b].interest, news_in_range[b].timestamp, news_in_range[b].timestamp);
+                    if (news_in_range[a].interest != news_in_range[b].interest) {
+                        return news_in_range[a].interest > news_in_range[b].interest;
+                    } else if (news_in_range[a].timestamp != news_in_range[b].timestamp) {
+                        return news_in_range[a].timestamp < news_in_range[b].timestamp;
+                    } else {
+                        return news_in_range[a].id > news_in_range[b].id;
+                    }
                 });
                 
                 for (int i = 0; i < filtered_news_ids.size(); ++i) {
