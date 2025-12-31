@@ -13,7 +13,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
 endif()
 
+# Header-only "library"
+add_library(newsaggregator INTERFACE)
+target_include_directories(newsaggregator INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
 add_executable(newservice src/main.cpp)
+target_link_libraries(newservice PRIVATE newsaggregator)
 
 # === GoogleTest ===
 include(FetchContent)
@@ -33,16 +40,17 @@ enable_testing()
 
 # === Add your test executable ===
 add_executable(
-    hello_newservice
+    test_newservice
     tests/test_newservice.cpp
 )
 
 target_link_libraries(
-    hello_newservice
+    test_newservice
     PRIVATE
         gtest_main
+        newsaggregator
 )
 
 # === Register tests with CTest ===
 include(GoogleTest)
-gtest_discover_tests(hello_newservice)
+gtest_discover_tests(test_newservice)
