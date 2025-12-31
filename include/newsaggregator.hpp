@@ -38,19 +38,23 @@ public:
             topic_subs_[t].push_back(id); // bookeeping this user belongs to this topic
             // check if we have existing news in this topic, if yes, assign them to this user if interested
             if (topic_news_.contains(t)) {
-                for (auto news_id : topic_news_.at(t)) {
-                    const News & n = news_.at(news_id);
-                    if (n.interest >= sub.minInterest) {
-                        News_metadata md{n.timestamp, n.interest, news_id};
-                        sub_news_.at(id).insert({news_.at(news_id).timestamp, std::move(md)});
+                try { // .at() throws
+                    for (auto news_id : topic_news_.at(t)) {
+                        const News & n = news_.at(news_id);
+                        if (n.interest >= sub.minInterest) {
+                            News_metadata md{n.timestamp, n.interest, news_id};
+                            sub_news_.at(id).insert({news_.at(news_id).timestamp, std::move(md)});
+                        }
                     }
+                } catch (std::out_of_range) {
+                    return false;
                 }
             }
         }
 
         subs_.insert_or_assign(id, std::move(sub));
 
-        return true; // todo: impelement proper error handling, maybe try catch for the maps manipuations
+        return true;
     }
 
     bool NewsReceived(unsigned int id, float timestamp, unsigned int interest, std::vector<std::string> && topics) {
@@ -131,5 +135,5 @@ private:
     std::unordered_map<unsigned int, News> news_;
     std::unordered_map<std::string, std::vector<unsigned int>> topic_news_; // bookeeping for news assigned to topics
     std::unordered_map<std::string, std::vector<unsigned int>> topic_subs_; // bookeeping for subs assigned to topics
-    std::unordered_map<unsigned int, std::multimap<float, News_metadata>> sub_news_; // todo: maybe just use multimat<ts, newsid> and deprecate news_metadata
+    std::unordered_map<unsigned int, std::multimap<float, News_metadata>> sub_news_; // todo: maybe just use multimap<ts, newsid> and deprecate news_metadata
 };
