@@ -64,7 +64,7 @@ public:
             topics_news_[t].push_back(id); // bookeeping this news belongs to these topics
             // assings this new to the users who are interested in it
             for (const auto & sub_id : topics_subs_[t]) {
-                if (subs_[sub_id].minInterest >= news.interest) {
+                if (subs_[sub_id].minInterest <= news.interest) {
                     News_metadata md{news.timestamp, news.interest, id};
                     subnews_[sub_id].insert({news.timestamp, move(md)});
                 }
@@ -146,8 +146,8 @@ int main() {
     nag.AddSubscription(1, 5, 2, vector<string>{"radio", "television"});
     nag.AddSubscription(2, 7, 3, vector<string>{"cable"});
     nag.NewsReceived(10, 100.0f, 4, vector<string>{"television"});
-    nag.NewsReceived(11, 100.0f, 4, vector<string>{"television", "cable"});
-    nag.NewsReceived(12, 150.0f, 4, vector<string>{"television", "streaming"});
+    nag.NewsReceived(11, 100.0f, 5, vector<string>{"television", "cable"});
+    nag.NewsReceived(12, 150.0f, 7, vector<string>{"television", "streaming"});
     map<unsigned int, set<unsigned int>> pubs = nag.Publish(200.0f, 100.0f);
     print(pubs);
 
