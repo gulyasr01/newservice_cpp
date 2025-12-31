@@ -92,35 +92,33 @@ public:
 
         for (const auto & subnews : subnews_) {
             // get the metadatas of the news in the given time range
-            vector<News_metadata> news_in_range;
+            vector<const News_metadata *> news_in_range;
             auto itStart = subnews.second.lower_bound(start_t);
             auto itEnd = subnews.second.lower_bound(end_t);
             for (auto it = itStart; it != itEnd; ++it) {
-                news_in_range.push_back(it->second);
+                news_in_range.push_back(&it->second);
             }
 
             const Subscriber & sub = subs_[subnews.first];
             // all the news in the time range can be displayed
             if (news_in_range.size() <= sub.maxNewsPerSecond) {
-                for (const auto & md : news_in_range) {
-                    news_to_users[md.id].insert(subnews.first); // converting: user gets new -> new gets this user
+                for (const auto md : news_in_range) {
+                    news_to_users[md->id].insert(subnews.first); // converting: user gets new -> new gets this user
                 }
             // news need to be sorted
             } else {
-                vector<unsigned> filtered_idxs_desc(news_in_range.size());
-                iota(filtered_idxs_desc.begin(), filtered_idxs_desc.end(), 0); // indexes
-                sort(filtered_idxs_desc.begin(), filtered_idxs_desc.end(), [&](int a, int b){
-                    if (news_in_range[a].interest != news_in_range[b].interest) {
-                        return news_in_range[a].interest > news_in_range[b].interest;
-                    } else if (news_in_range[a].timestamp != news_in_range[b].timestamp) {
-                        return news_in_range[a].timestamp < news_in_range[b].timestamp;
+                sort(news_in_range.begin(), news_in_range.end(), [](const News_metadata * a, const News_metadata * b){
+                    if (a->interest != b->interest) {
+                        return a->interest > b->interest;
+                    } else if (a->timestamp != b->timestamp) {
+                        return a->timestamp < b->timestamp;
                     } else {
-                        return news_in_range[a].id > news_in_range[b].id;
+                        return a->id > b->id;
                     }
                 });
                 
                 for (int i = 0; i < sub.maxNewsPerSecond; ++i) {
-                    news_to_users[news_in_range[filtered_idxs_desc[i]].id].insert(subnews.first); // converting: user gets new -> new gets this user
+                    news_to_users[news_in_range[i]->id].insert(subnews.first); // converting: user gets new -> new gets this user
                 }
             }
         }
