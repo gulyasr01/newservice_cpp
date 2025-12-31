@@ -57,6 +57,28 @@ public:
         return true;
     }
 
+    bool RemoveSubscription(unsigned int id) {
+        if (!subs_.contains(id)) {
+            return false;
+        }
+
+        // delete this id from all topics
+        for (const auto & t : subs_[id].topics) {
+            auto & sub_ids = topic_subs_[t];
+            for (auto it = sub_ids.begin(); it != sub_ids.begin(); it++) {
+                if (*it == id) {
+                    sub_ids.erase(it);
+                    break;
+                }
+            }
+        }
+
+        subs_.erase(id);
+        sub_news_.erase(id);
+
+        return true;
+    }
+
     bool NewsReceived(unsigned int id, float timestamp, unsigned int interest, std::vector<std::string> && topics) {
         if (news_.contains(id)) {
             return false;
